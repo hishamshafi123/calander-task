@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, SubmitEvent } from "react";
 import { useStore } from "@/lib/store";
 import { Task, TaskStatus, TaskPriority } from "@/lib/types";
 import {
@@ -73,7 +73,7 @@ export default function TaskFormModal({
     }
   }, [task, defaultDate, categories, open]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: SubmitEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
 

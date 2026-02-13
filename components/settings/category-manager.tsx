@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { SubmitEvent, useState } from "react";
 import { useStore } from "@/lib/store";
 import { Category, CategoryType } from "@/lib/types";
 import { Button } from "@/components/ui/button";
@@ -46,7 +46,7 @@ export default function CategoryManager() {
     setShowModal(true);
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: SubmitEvent) => {
     e.preventDefault();
 
     try {
