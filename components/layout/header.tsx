@@ -8,32 +8,28 @@ import TaskFormModal from "@/components/tasks/task-form-modal";
 
 export default function Header() {
   const { settings, setSettings } = useStore();
-  const [isDark, setIsDark] = useState(false);
+  const isDark = settings?.darkMode ?? false;
   const [showTaskModal, setShowTaskModal] = useState(false);
 
   useEffect(() => {
-    if (settings?.darkMode) {
-      setIsDark(settings.darkMode);
-      document.documentElement.classList.toggle("dark", settings.darkMode);
-    }
-  }, [settings]);
+    document.documentElement.classList.toggle("dark", isDark);
+  }, [isDark]);
 
   const toggleDarkMode = async () => {
+    if (!settings) return;
+
     const newDarkMode = !isDark;
-    setIsDark(newDarkMode);
     document.documentElement.classList.toggle("dark", newDarkMode);
 
-    if (settings) {
-      const updatedSettings = { ...settings, darkMode: newDarkMode };
-      setSettings(updatedSettings);
+    const updatedSettings = { ...settings, darkMode: newDarkMode };
+    setSettings(updatedSettings);
 
-      // Update in database
-      await fetch("/api/settings", {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(updatedSettings),
-      });
-    }
+    // Update in database
+    await fetch("/api/settings", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(updatedSettings),
+    });
   };
 
   return (
