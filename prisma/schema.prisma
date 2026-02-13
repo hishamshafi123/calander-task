@@ -42,6 +42,20 @@ model Task {
   @@map("tasks")
 }
 
+model User {
+  id                String   @id @default(uuid())
+  fullName          String
+  username          String   @unique
+  email             String?  @unique
+  passwordHash      String
+  role              String   @default("admin")
+  passwordChangedAt DateTime @default(now())
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@map("users")
+}
+
 model Settings {
   id             String   @id @default(uuid())
   weekStartsOn   Int      @default(1) // 0 = Sunday, 1 = Monday
