@@ -1,21 +1,27 @@
-'use client'
+"use client";
 
-import { useState, useEffect } from 'react'
-import { useStore } from '@/lib/store'
-import { Task, TaskStatus, TaskPriority } from '@/lib/types'
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Textarea } from '@/components/ui/textarea'
-import { Label } from '@/components/ui/label'
-import { Select } from '@/components/ui/select'
-import { Trash2 } from 'lucide-react'
+import { useState, useEffect } from "react";
+import { useStore } from "@/lib/store";
+import { Task, TaskStatus, TaskPriority } from "@/lib/types";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { Select } from "@/components/ui/select";
+import { Trash2 } from "lucide-react";
 
 interface TaskFormModalProps {
-  open: boolean
-  onOpenChange: (open: boolean) => void
-  task?: Task | null
-  defaultDate?: Date
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  task?: Task | null;
+  defaultDate?: Date;
 }
 
 export default function TaskFormModal({
@@ -24,52 +30,52 @@ export default function TaskFormModal({
   task = null,
   defaultDate,
 }: TaskFormModalProps) {
-  const { categories, addTask, updateTask, deleteTask } = useStore()
-  const [isSubmitting, setIsSubmitting] = useState(false)
+  const { categories, addTask, updateTask, deleteTask } = useStore();
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Form state
-  const [title, setTitle] = useState('')
-  const [description, setDescription] = useState('')
-  const [notes, setNotes] = useState('')
-  const [date, setDate] = useState('')
-  const [startTime, setStartTime] = useState('')
-  const [endTime, setEndTime] = useState('')
-  const [status, setStatus] = useState<TaskStatus>('not-started')
-  const [priority, setPriority] = useState<TaskPriority>('medium')
-  const [categoryId, setCategoryId] = useState('')
-  const [show, setShow] = useState(true)
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [notes, setNotes] = useState("");
+  const [date, setDate] = useState("");
+  const [startTime, setStartTime] = useState("");
+  const [endTime, setEndTime] = useState("");
+  const [status, setStatus] = useState<TaskStatus>("not-started");
+  const [priority, setPriority] = useState<TaskPriority>("medium");
+  const [categoryId, setCategoryId] = useState("");
+  const [show, setShow] = useState(true);
 
   // Initialize form with task data or defaults
   useEffect(() => {
     if (task) {
-      setTitle(task.title)
-      setDescription(task.description || '')
-      setNotes(task.description || '') // Using description as notes for now
-      setDate(task.date ? new Date(task.date).toISOString().split('T')[0] : '')
-      setStartTime(task.startTime || '')
-      setEndTime(task.endTime || '')
-      setStatus(task.status)
-      setPriority(task.priority)
-      setCategoryId(task.categoryId)
-      setShow(task.show)
+      setTitle(task.title);
+      setDescription(task.description || "");
+      setNotes(task.description || ""); // Using description as notes for now
+      setDate(task.date ? new Date(task.date).toISOString().split("T")[0] : "");
+      setStartTime(task.startTime || "");
+      setEndTime(task.endTime || "");
+      setStatus(task.status);
+      setPriority(task.priority);
+      setCategoryId(task.categoryId);
+      setShow(task.show);
     } else {
       // Reset form
-      setTitle('')
-      setDescription('')
-      setNotes('')
-      setDate(defaultDate ? defaultDate.toISOString().split('T')[0] : '')
-      setStartTime('')
-      setEndTime('')
-      setStatus('not-started')
-      setPriority('medium')
-      setCategoryId(categories[0]?.id || '')
-      setShow(true)
+      setTitle("");
+      setDescription("");
+      setNotes("");
+      setDate(defaultDate ? defaultDate.toISOString().split("T")[0] : "");
+      setStartTime("");
+      setEndTime("");
+      setStatus("not-started");
+      setPriority("medium");
+      setCategoryId(categories[0]?.id || "");
+      setShow(true);
     }
-  }, [task, defaultDate, categories, open])
+  }, [task, defaultDate, categories, open]);
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsSubmitting(true)
+    e.preventDefault();
+    setIsSubmitting(true);
 
     try {
       const taskData = {
@@ -82,68 +88,68 @@ export default function TaskFormModal({
         priority,
         categoryId,
         show,
-      }
+      };
 
       if (task) {
         // Update existing task
         const response = await fetch(`/api/tasks/${task.id}`, {
-          method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify(taskData),
-        })
+        });
 
         if (response.ok) {
-          const updatedTask = await response.json()
-          updateTask(task.id, updatedTask)
+          const updatedTask = await response.json();
+          updateTask(task.id, updatedTask);
         }
       } else {
         // Create new task
-        const response = await fetch('/api/tasks', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+        const response = await fetch("/api/tasks", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify(taskData),
-        })
+        });
 
         if (response.ok) {
-          const newTask = await response.json()
-          addTask(newTask)
+          const newTask = await response.json();
+          addTask(newTask);
         }
       }
 
-      onOpenChange(false)
+      onOpenChange(false);
     } catch (error) {
-      console.error('Error saving task:', error)
-      alert('Failed to save task')
+      console.error("Error saving task:", error);
+      alert("Failed to save task");
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     }
-  }
+  };
 
   const handleDelete = async () => {
-    if (!task) return
+    if (!task) return;
 
-    if (confirm('Are you sure you want to delete this task?')) {
+    if (confirm("Are you sure you want to delete this task?")) {
       try {
         const response = await fetch(`/api/tasks/${task.id}`, {
-          method: 'DELETE',
-        })
+          method: "DELETE",
+        });
 
         if (response.ok) {
-          deleteTask(task.id)
-          onOpenChange(false)
+          deleteTask(task.id);
+          onOpenChange(false);
         }
       } catch (error) {
-        console.error('Error deleting task:', error)
-        alert('Failed to delete task')
+        console.error("Error deleting task:", error);
+        alert("Failed to delete task");
       }
     }
-  }
+  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent onClose={() => onOpenChange(false)}>
         <DialogHeader>
-          <DialogTitle>{task ? 'Edit Task' : 'Create New Task'}</DialogTitle>
+          <DialogTitle>{task ? "Edit Task" : "Create New Task"}</DialogTitle>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -285,7 +291,7 @@ export default function TaskFormModal({
                   Cancel
                 </Button>
                 <Button type="submit" disabled={isSubmitting}>
-                  {isSubmitting ? 'Saving...' : task ? 'Update' : 'Create'}
+                  {isSubmitting ? "Saving..." : task ? "Update" : "Create"}
                 </Button>
               </div>
             </div>
@@ -293,5 +299,5 @@ export default function TaskFormModal({
         </form>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

@@ -1,65 +1,72 @@
-'use client'
+"use client";
 
-import { useState } from 'react'
-import { useStore } from '@/lib/store'
-import { Category, CategoryType } from '@/lib/types'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
-import { Plus, Pencil, Trash2 } from 'lucide-react'
+import { useState } from "react";
+import { useStore } from "@/lib/store";
+import { Category, CategoryType } from "@/lib/types";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Plus, Pencil, Trash2 } from "lucide-react";
 
 export default function CategoryManager() {
-  const { categories, addCategory, updateCategory, deleteCategory } = useStore()
-  const [showModal, setShowModal] = useState(false)
-  const [editingCategory, setEditingCategory] = useState<Category | null>(null)
-  const [name, setName] = useState('')
-  const [icon, setIcon] = useState('')
-  const [color, setColor] = useState('#3b82f6')
-  const [type, setType] = useState<CategoryType>('life')
+  const { categories, addCategory, updateCategory, deleteCategory } =
+    useStore();
+  const [showModal, setShowModal] = useState(false);
+  const [editingCategory, setEditingCategory] = useState<Category | null>(null);
+  const [name, setName] = useState("");
+  const [icon, setIcon] = useState("");
+  const [color, setColor] = useState("#3b82f6");
+  const [type, setType] = useState<CategoryType>("life");
 
   const resetForm = () => {
-    setName('')
-    setIcon('')
-    setColor('#3b82f6')
-    setType('life')
-    setEditingCategory(null)
-  }
+    setName("");
+    setIcon("");
+    setColor("#3b82f6");
+    setType("life");
+    setEditingCategory(null);
+  };
 
   const handleOpenModal = (category?: Category) => {
     if (category) {
-      setEditingCategory(category)
-      setName(category.name)
-      setIcon(category.icon)
-      setColor(category.color)
-      setType(category.type)
+      setEditingCategory(category);
+      setName(category.name);
+      setIcon(category.icon);
+      setColor(category.color);
+      setType(category.type);
     } else {
-      resetForm()
+      resetForm();
     }
-    setShowModal(true)
-  }
+    setShowModal(true);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
 
     try {
       if (editingCategory) {
         // Update existing category
         const response = await fetch(`/api/categories/${editingCategory.id}`, {
-          method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ name, icon, color, type }),
-        })
+        });
 
         if (response.ok) {
-          const updated = await response.json()
-          updateCategory(editingCategory.id, updated)
+          const updated = await response.json();
+          updateCategory(editingCategory.id, updated);
         }
       } else {
         // Create new category
-        const response = await fetch('/api/categories', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+        const response = await fetch("/api/categories", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             name,
             icon,
@@ -67,41 +74,45 @@ export default function CategoryManager() {
             type,
             order: categories.length,
           }),
-        })
+        });
 
         if (response.ok) {
-          const newCategory = await response.json()
-          addCategory(newCategory)
+          const newCategory = await response.json();
+          addCategory(newCategory);
         }
       }
 
-      setShowModal(false)
-      resetForm()
+      setShowModal(false);
+      resetForm();
     } catch (error) {
-      console.error('Error saving category:', error)
-      alert('Failed to save category')
+      console.error("Error saving category:", error);
+      alert("Failed to save category");
     }
-  }
+  };
 
   const handleDelete = async (category: Category) => {
-    if (confirm(`Are you sure you want to delete "${category.name}"? This will affect all tasks in this category.`)) {
+    if (
+      confirm(
+        `Are you sure you want to delete "${category.name}"? This will affect all tasks in this category.`,
+      )
+    ) {
       try {
         const response = await fetch(`/api/categories/${category.id}`, {
-          method: 'DELETE',
-        })
+          method: "DELETE",
+        });
 
         if (response.ok) {
-          deleteCategory(category.id)
+          deleteCategory(category.id);
         }
       } catch (error) {
-        console.error('Error deleting category:', error)
-        alert('Failed to delete category')
+        console.error("Error deleting category:", error);
+        alert("Failed to delete category");
       }
     }
-  }
+  };
 
-  const lifeCategories = categories.filter(c => c.type === 'life')
-  const businessCategories = categories.filter(c => c.type === 'business')
+  const lifeCategories = categories.filter((c) => c.type === "life");
+  const businessCategories = categories.filter((c) => c.type === "business");
 
   const CategoryCard = ({ category }: { category: Category }) => (
     <div
@@ -142,7 +153,7 @@ export default function CategoryManager() {
         </Button>
       </div>
     </div>
-  )
+  );
 
   return (
     <div>
@@ -198,7 +209,7 @@ export default function CategoryManager() {
         <DialogContent onClose={() => setShowModal(false)}>
           <DialogHeader>
             <DialogTitle>
-              {editingCategory ? 'Edit Category' : 'Add New Category'}
+              {editingCategory ? "Edit Category" : "Add New Category"}
             </DialogTitle>
           </DialogHeader>
 
@@ -258,22 +269,26 @@ export default function CategoryManager() {
                     type="radio"
                     name="categoryType"
                     value="life"
-                    checked={type === 'life'}
+                    checked={type === "life"}
                     onChange={(e) => setType(e.target.value as CategoryType)}
                     className="w-4 h-4 text-blue-600"
                   />
-                  <span className="text-sm text-gray-900 dark:text-white">Life</span>
+                  <span className="text-sm text-gray-900 dark:text-white">
+                    Life
+                  </span>
                 </label>
                 <label className="flex items-center space-x-2 cursor-pointer">
                   <input
                     type="radio"
                     name="categoryType"
                     value="business"
-                    checked={type === 'business'}
+                    checked={type === "business"}
                     onChange={(e) => setType(e.target.value as CategoryType)}
                     className="w-4 h-4 text-blue-600"
                   />
-                  <span className="text-sm text-gray-900 dark:text-white">Business</span>
+                  <span className="text-sm text-gray-900 dark:text-white">
+                    Business
+                  </span>
                 </label>
               </div>
             </div>
@@ -287,12 +302,12 @@ export default function CategoryManager() {
                 Cancel
               </Button>
               <Button type="submit">
-                {editingCategory ? 'Update' : 'Create'}
+                {editingCategory ? "Update" : "Create"}
               </Button>
             </DialogFooter>
           </form>
         </DialogContent>
       </Dialog>
     </div>
-  )
+  );
 }

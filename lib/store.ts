@@ -1,40 +1,46 @@
-import { create } from 'zustand'
-import { Task, Category, Settings, CalendarView, CategoryFilter } from './types'
+import { create } from "zustand";
+import {
+  Task,
+  Category,
+  Settings,
+  CalendarView,
+  CategoryFilter,
+} from "./types";
 
 interface AppState {
-  tasks: Task[]
-  categories: Category[]
-  settings: Settings | null
-  currentView: CalendarView
-  selectedDate: Date
-  isLoading: boolean
-  categoryFilter: CategoryFilter
+  tasks: Task[];
+  categories: Category[];
+  settings: Settings | null;
+  currentView: CalendarView;
+  selectedDate: Date;
+  isLoading: boolean;
+  categoryFilter: CategoryFilter;
 
-  setTasks: (tasks: Task[]) => void
-  setCategories: (categories: Category[]) => void
-  setSettings: (settings: Settings) => void
-  setCurrentView: (view: CalendarView) => void
-  setSelectedDate: (date: Date) => void
-  setIsLoading: (loading: boolean) => void
-  setCategoryFilter: (filter: CategoryFilter) => void
+  setTasks: (tasks: Task[]) => void;
+  setCategories: (categories: Category[]) => void;
+  setSettings: (settings: Settings) => void;
+  setCurrentView: (view: CalendarView) => void;
+  setSelectedDate: (date: Date) => void;
+  setIsLoading: (loading: boolean) => void;
+  setCategoryFilter: (filter: CategoryFilter) => void;
 
-  addTask: (task: Task) => void
-  updateTask: (id: string, task: Partial<Task>) => void
-  deleteTask: (id: string) => void
+  addTask: (task: Task) => void;
+  updateTask: (id: string, task: Partial<Task>) => void;
+  deleteTask: (id: string) => void;
 
-  addCategory: (category: Category) => void
-  updateCategory: (id: string, category: Partial<Category>) => void
-  deleteCategory: (id: string) => void
+  addCategory: (category: Category) => void;
+  updateCategory: (id: string, category: Partial<Category>) => void;
+  deleteCategory: (id: string) => void;
 }
 
 export const useStore = create<AppState>((set) => ({
   tasks: [],
   categories: [],
   settings: null,
-  currentView: 'month',
+  currentView: "month",
   selectedDate: new Date(),
   isLoading: false,
-  categoryFilter: 'all',
+  categoryFilter: "all",
 
   setTasks: (tasks) => set({ tasks }),
   setCategories: (categories) => set({ categories }),
@@ -47,7 +53,9 @@ export const useStore = create<AppState>((set) => ({
   addTask: (task) => set((state) => ({ tasks: [...state.tasks, task] })),
   updateTask: (id, updatedTask) =>
     set((state) => ({
-      tasks: state.tasks.map((t) => (t.id === id ? { ...t, ...updatedTask } : t)),
+      tasks: state.tasks.map((t) =>
+        t.id === id ? { ...t, ...updatedTask } : t,
+      ),
     })),
   deleteTask: (id) =>
     set((state) => ({ tasks: state.tasks.filter((t) => t.id !== id) })),
@@ -57,9 +65,11 @@ export const useStore = create<AppState>((set) => ({
   updateCategory: (id, updatedCategory) =>
     set((state) => ({
       categories: state.categories.map((c) =>
-        c.id === id ? { ...c, ...updatedCategory } : c
+        c.id === id ? { ...c, ...updatedCategory } : c,
       ),
     })),
   deleteCategory: (id) =>
-    set((state) => ({ categories: state.categories.filter((c) => c.id !== id) })),
-}))
+    set((state) => ({
+      categories: state.categories.filter((c) => c.id !== id),
+    })),
+}));

@@ -1,40 +1,40 @@
-'use client'
+"use client";
 
-import { Calendar, Moon, Sun, Plus } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { useStore } from '@/lib/store'
-import { useState, useEffect } from 'react'
-import TaskFormModal from '@/components/tasks/task-form-modal'
+import { Calendar, Moon, Sun, Plus } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useStore } from "@/lib/store";
+import { useState, useEffect } from "react";
+import TaskFormModal from "@/components/tasks/task-form-modal";
 
 export default function Header() {
-  const { settings, setSettings } = useStore()
-  const [isDark, setIsDark] = useState(false)
-  const [showTaskModal, setShowTaskModal] = useState(false)
+  const { settings, setSettings } = useStore();
+  const [isDark, setIsDark] = useState(false);
+  const [showTaskModal, setShowTaskModal] = useState(false);
 
   useEffect(() => {
     if (settings?.darkMode) {
-      setIsDark(settings.darkMode)
-      document.documentElement.classList.toggle('dark', settings.darkMode)
+      setIsDark(settings.darkMode);
+      document.documentElement.classList.toggle("dark", settings.darkMode);
     }
-  }, [settings])
+  }, [settings]);
 
   const toggleDarkMode = async () => {
-    const newDarkMode = !isDark
-    setIsDark(newDarkMode)
-    document.documentElement.classList.toggle('dark', newDarkMode)
+    const newDarkMode = !isDark;
+    setIsDark(newDarkMode);
+    document.documentElement.classList.toggle("dark", newDarkMode);
 
     if (settings) {
-      const updatedSettings = { ...settings, darkMode: newDarkMode }
-      setSettings(updatedSettings)
+      const updatedSettings = { ...settings, darkMode: newDarkMode };
+      setSettings(updatedSettings);
 
       // Update in database
-      await fetch('/api/settings', {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
+      await fetch("/api/settings", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(updatedSettings),
-      })
+      });
     }
-  }
+  };
 
   return (
     <header className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
@@ -69,10 +69,7 @@ export default function Header() {
         </div>
       </div>
 
-      <TaskFormModal
-        open={showTaskModal}
-        onOpenChange={setShowTaskModal}
-      />
+      <TaskFormModal open={showTaskModal} onOpenChange={setShowTaskModal} />
     </header>
-  )
+  );
 }

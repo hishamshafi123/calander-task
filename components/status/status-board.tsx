@@ -1,36 +1,36 @@
-'use client'
+"use client";
 
-import { useState } from 'react'
-import { useStore } from '@/lib/store'
-import { Task, TaskStatus } from '@/lib/types'
-import StatusColumn from './status-column'
-import TaskFormModal from '@/components/tasks/task-form-modal'
+import { useState } from "react";
+import { useStore } from "@/lib/store";
+import { Task, TaskStatus } from "@/lib/types";
+import StatusColumn from "./status-column";
+import TaskFormModal from "@/components/tasks/task-form-modal";
 
 const columns: { status: TaskStatus; label: string; icon: string }[] = [
-  { status: 'not-started', label: 'Not Started', icon: '⭕' },
-  { status: 'waiting', label: 'Waiting', icon: '⏳' },
-  { status: 'in-progress', label: 'In Progress', icon: '🔄' },
-  { status: 'completed', label: 'Completed', icon: '✅' },
-]
+  { status: "not-started", label: "Not Started", icon: "⭕" },
+  { status: "waiting", label: "Waiting", icon: "⏳" },
+  { status: "in-progress", label: "In Progress", icon: "🔄" },
+  { status: "completed", label: "Completed", icon: "✅" },
+];
 
 export default function StatusBoard() {
-  const { tasks } = useStore()
-  const [selectedTask, setSelectedTask] = useState<Task | null>(null)
-  const [showTaskModal, setShowTaskModal] = useState(false)
+  const { tasks } = useStore();
+  const [selectedTask, setSelectedTask] = useState<Task | null>(null);
+  const [showTaskModal, setShowTaskModal] = useState(false);
 
   const getTasksByStatus = (status: TaskStatus) => {
-    return tasks.filter((task) => task.status === status && task.show)
-  }
+    return tasks.filter((task) => task.status === status && task.show);
+  };
 
   const handleTaskClick = (task: Task) => {
-    setSelectedTask(task)
-    setShowTaskModal(true)
-  }
+    setSelectedTask(task);
+    setShowTaskModal(true);
+  };
 
   const handleCloseModal = () => {
-    setShowTaskModal(false)
-    setSelectedTask(null)
-  }
+    setShowTaskModal(false);
+    setSelectedTask(null);
+  };
 
   return (
     <div>
@@ -59,11 +59,11 @@ export default function StatusBoard() {
       <TaskFormModal
         open={showTaskModal}
         onOpenChange={(open) => {
-          if (!open) handleCloseModal()
-          else setShowTaskModal(open)
+          if (!open) handleCloseModal();
+          else setShowTaskModal(open);
         }}
         task={selectedTask}
       />
     </div>
-  )
+  );
 }

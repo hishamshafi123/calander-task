@@ -1,17 +1,17 @@
-'use client'
+"use client";
 
-import { useState } from 'react'
-import { Category, Task } from '@/lib/types'
-import { useStore } from '@/lib/store'
-import TaskCard from '@/components/tasks/task-card'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Pencil, Trash2, Check, X } from 'lucide-react'
+import { useState } from "react";
+import { Category, Task } from "@/lib/types";
+import { useStore } from "@/lib/store";
+import TaskCard from "@/components/tasks/task-card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Pencil, Trash2, Check, X } from "lucide-react";
 
 interface CategoryColumnProps {
-  category: Category
-  tasks: Task[]
-  onTaskClick?: (task: Task) => void
+  category: Category;
+  tasks: Task[];
+  onTaskClick?: (task: Task) => void;
 }
 
 export default function CategoryColumn({
@@ -19,59 +19,67 @@ export default function CategoryColumn({
   tasks,
   onTaskClick,
 }: CategoryColumnProps) {
-  const { updateCategory, deleteCategory } = useStore()
-  const [isEditing, setIsEditing] = useState(false)
-  const [editName, setEditName] = useState(category.name)
+  const { updateCategory, deleteCategory } = useStore();
+  const [isEditing, setIsEditing] = useState(false);
+  const [editName, setEditName] = useState(category.name);
 
   const handleSave = async () => {
     if (editName.trim() && editName !== category.name) {
       try {
         const response = await fetch(`/api/categories/${category.id}`, {
-          method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ name: editName, icon: category.icon, color: category.color }),
-        })
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            name: editName,
+            icon: category.icon,
+            color: category.color,
+          }),
+        });
 
         if (response.ok) {
-          const updated = await response.json()
-          updateCategory(category.id, updated)
+          const updated = await response.json();
+          updateCategory(category.id, updated);
         }
       } catch (error) {
-        console.error('Error updating category:', error)
+        console.error("Error updating category:", error);
       }
     }
-    setIsEditing(false)
-  }
+    setIsEditing(false);
+  };
 
   const handleDelete = async () => {
-    if (confirm(`Delete "${category.name}" category? This will affect ${tasks.length} task(s).`)) {
+    if (
+      confirm(
+        `Delete "${category.name}" category? This will affect ${tasks.length} task(s).`,
+      )
+    ) {
       try {
         const response = await fetch(`/api/categories/${category.id}`, {
-          method: 'DELETE',
-        })
+          method: "DELETE",
+        });
 
         if (response.ok) {
-          deleteCategory(category.id)
+          deleteCategory(category.id);
         }
       } catch (error) {
-        console.error('Error deleting category:', error)
-        alert('Failed to delete category')
+        console.error("Error deleting category:", error);
+        alert("Failed to delete category");
       }
     }
-  }
+  };
 
   const handleCancel = () => {
-    setEditName(category.name)
-    setIsEditing(false)
-  }
+    setEditName(category.name);
+    setIsEditing(false);
+  };
 
   return (
     <div className="flex flex-col h-full">
       <div
         className="px-4 py-3 rounded-t-lg border-b-4"
         style={{
-          backgroundColor: category.color + '20',
-          borderColor: category.color
+          backgroundColor: category.color + "20",
+          borderColor: category.color,
         }}
       >
         <div className="flex items-center justify-between">
@@ -83,8 +91,8 @@ export default function CategoryColumn({
                   value={editName}
                   onChange={(e) => setEditName(e.target.value)}
                   onKeyDown={(e) => {
-                    if (e.key === 'Enter') handleSave()
-                    if (e.key === 'Escape') handleCancel()
+                    if (e.key === "Enter") handleSave();
+                    if (e.key === "Escape") handleCancel();
                   }}
                   className="h-8 text-sm"
                   autoFocus
@@ -154,5 +162,5 @@ export default function CategoryColumn({
         )}
       </div>
     </div>
-  )
+  );
 }

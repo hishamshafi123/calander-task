@@ -1,19 +1,24 @@
-'use client'
+"use client";
 
-import { useState } from 'react'
-import { Task } from '@/lib/types'
-import { format } from 'date-fns'
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { Button } from '@/components/ui/button'
-import TaskCard from '@/components/tasks/task-card'
-import TaskFormModal from '@/components/tasks/task-form-modal'
-import { Plus } from 'lucide-react'
+import { useState } from "react";
+import { Task } from "@/lib/types";
+import { format } from "date-fns";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import TaskCard from "@/components/tasks/task-card";
+import TaskFormModal from "@/components/tasks/task-form-modal";
+import { Plus } from "lucide-react";
 
 interface DayTasksModalProps {
-  open: boolean
-  onOpenChange: (open: boolean) => void
-  date: Date | null
-  tasks: Task[]
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  date: Date | null;
+  tasks: Task[];
 }
 
 export default function DayTasksModal({
@@ -22,50 +27,51 @@ export default function DayTasksModal({
   date,
   tasks,
 }: DayTasksModalProps) {
-  const [selectedTask, setSelectedTask] = useState<Task | null>(null)
-  const [showTaskModal, setShowTaskModal] = useState(false)
-  const [showNewTaskModal, setShowNewTaskModal] = useState(false)
+  const [selectedTask, setSelectedTask] = useState<Task | null>(null);
+  const [showTaskModal, setShowTaskModal] = useState(false);
+  const [showNewTaskModal, setShowNewTaskModal] = useState(false);
 
   const handleTaskClick = (task: Task) => {
-    setSelectedTask(task)
-    setShowTaskModal(true)
-  }
+    setSelectedTask(task);
+    setShowTaskModal(true);
+  };
 
   const handleNewTask = () => {
-    setShowNewTaskModal(true)
-  }
+    setShowNewTaskModal(true);
+  };
 
   const handleCloseTaskModal = () => {
-    setShowTaskModal(false)
-    setSelectedTask(null)
-  }
+    setShowTaskModal(false);
+    setSelectedTask(null);
+  };
 
-  if (!date) return null
+  if (!date) return null;
 
   // Group tasks by status
   const tasksByStatus = {
-    'not-started': tasks.filter(t => t.status === 'not-started'),
-    'waiting': tasks.filter(t => t.status === 'waiting'),
-    'in-progress': tasks.filter(t => t.status === 'in-progress'),
-    'completed': tasks.filter(t => t.status === 'completed'),
-  }
+    "not-started": tasks.filter((t) => t.status === "not-started"),
+    waiting: tasks.filter((t) => t.status === "waiting"),
+    "in-progress": tasks.filter((t) => t.status === "in-progress"),
+    completed: tasks.filter((t) => t.status === "completed"),
+  };
 
   const statusLabels = {
-    'not-started': 'Not Started',
-    'waiting': 'Waiting',
-    'in-progress': 'In Progress',
-    'completed': 'Completed',
-  }
+    "not-started": "Not Started",
+    waiting: "Waiting",
+    "in-progress": "In Progress",
+    completed: "Completed",
+  };
 
   return (
     <>
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto" onClose={() => onOpenChange(false)}>
+        <DialogContent
+          className="max-w-3xl max-h-[80vh] overflow-y-auto"
+          onClose={() => onOpenChange(false)}
+        >
           <DialogHeader>
             <div className="flex items-center justify-between">
-              <DialogTitle>
-                {format(date, 'EEEE, MMMM d, yyyy')}
-              </DialogTitle>
+              <DialogTitle>{format(date, "EEEE, MMMM d, yyyy")}</DialogTitle>
               <Button size="sm" onClick={handleNewTask}>
                 <Plus className="h-4 w-4 mr-2" />
                 Add Task
@@ -86,7 +92,7 @@ export default function DayTasksModal({
               </div>
             ) : (
               Object.entries(tasksByStatus).map(([status, statusTasks]) => {
-                if (statusTasks.length === 0) return null
+                if (statusTasks.length === 0) return null;
 
                 return (
                   <div key={status}>
@@ -106,7 +112,7 @@ export default function DayTasksModal({
                       ))}
                     </div>
                   </div>
-                )
+                );
               })
             )}
           </div>
@@ -116,8 +122,8 @@ export default function DayTasksModal({
       <TaskFormModal
         open={showTaskModal}
         onOpenChange={(open) => {
-          if (!open) handleCloseTaskModal()
-          else setShowTaskModal(open)
+          if (!open) handleCloseTaskModal();
+          else setShowTaskModal(open);
         }}
         task={selectedTask}
       />
@@ -128,5 +134,5 @@ export default function DayTasksModal({
         defaultDate={date}
       />
     </>
-  )
+  );
 }

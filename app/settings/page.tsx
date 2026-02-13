@@ -1,32 +1,34 @@
-'use client'
+"use client";
 
-import { useEffect, useState } from 'react'
-import { useStore } from '@/lib/store'
-import { Button } from '@/components/ui/button'
-import CategoryManager from '@/components/settings/category-manager'
+import { useEffect, useState } from "react";
+import { useStore } from "@/lib/store";
+import { Button } from "@/components/ui/button";
+import CategoryManager from "@/components/settings/category-manager";
 
 export default function SettingsPage() {
-  const { settings, setSettings, setCategories } = useStore()
-  const [weekStartsOn, setWeekStartsOn] = useState(1)
-  const [defaultView, setDefaultView] = useState<'month' | 'week' | 'day'>('month')
-  const [showCompleted, setShowCompleted] = useState(true)
+  const { settings, setSettings, setCategories } = useStore();
+  const [weekStartsOn, setWeekStartsOn] = useState(1);
+  const [defaultView, setDefaultView] = useState<"month" | "week" | "day">(
+    "month",
+  );
+  const [showCompleted, setShowCompleted] = useState(true);
 
   useEffect(() => {
     async function fetchData() {
-      const settingsRes = await fetch('/api/settings')
-      const settingsData = await settingsRes.json()
-      setSettings(settingsData)
-      setWeekStartsOn(settingsData.weekStartsOn)
-      setDefaultView(settingsData.defaultView)
-      setShowCompleted(settingsData.showCompleted)
+      const settingsRes = await fetch("/api/settings");
+      const settingsData = await settingsRes.json();
+      setSettings(settingsData);
+      setWeekStartsOn(settingsData.weekStartsOn);
+      setDefaultView(settingsData.defaultView);
+      setShowCompleted(settingsData.showCompleted);
 
-      const categoriesRes = await fetch('/api/categories')
-      const categoriesData = await categoriesRes.json()
-      setCategories(categoriesData)
+      const categoriesRes = await fetch("/api/categories");
+      const categoriesData = await categoriesRes.json();
+      setCategories(categoriesData);
     }
 
-    fetchData()
-  }, [setSettings, setCategories])
+    fetchData();
+  }, [setSettings, setCategories]);
 
   const handleSave = async () => {
     const updatedSettings = {
@@ -34,18 +36,18 @@ export default function SettingsPage() {
       weekStartsOn,
       defaultView,
       showCompleted,
-    }
+    };
 
-    setSettings(updatedSettings)
+    setSettings(updatedSettings);
 
-    await fetch('/api/settings', {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
+    await fetch("/api/settings", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(updatedSettings),
-    })
+    });
 
-    alert('Settings saved successfully!')
-  }
+    alert("Settings saved successfully!");
+  };
 
   return (
     <div className="p-6 max-w-4xl mx-auto">
@@ -81,7 +83,9 @@ export default function SettingsPage() {
           </label>
           <select
             value={defaultView}
-            onChange={(e) => setDefaultView(e.target.value as 'month' | 'week' | 'day')}
+            onChange={(e) =>
+              setDefaultView(e.target.value as "month" | "week" | "day")
+            }
             className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
           >
             <option value="month">Month</option>
@@ -116,5 +120,5 @@ export default function SettingsPage() {
         <CategoryManager />
       </div>
     </div>
-  )
+  );
 }

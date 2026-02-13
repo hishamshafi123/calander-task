@@ -1,32 +1,32 @@
-'use client'
+"use client";
 
-import { useState } from 'react'
-import { useStore } from '@/lib/store'
-import { Task } from '@/lib/types'
-import CategoryColumn from './category-column'
-import TaskFormModal from '@/components/tasks/task-form-modal'
+import { useState } from "react";
+import { useStore } from "@/lib/store";
+import { Task } from "@/lib/types";
+import CategoryColumn from "./category-column";
+import TaskFormModal from "@/components/tasks/task-form-modal";
 
 export default function CategoriesBoard() {
-  const { tasks, categories } = useStore()
-  const [selectedTask, setSelectedTask] = useState<Task | null>(null)
-  const [showTaskModal, setShowTaskModal] = useState(false)
+  const { tasks, categories } = useStore();
+  const [selectedTask, setSelectedTask] = useState<Task | null>(null);
+  const [showTaskModal, setShowTaskModal] = useState(false);
 
-  const lifeCategories = categories.filter(c => c.type === 'life')
-  const businessCategories = categories.filter(c => c.type === 'business')
+  const lifeCategories = categories.filter((c) => c.type === "life");
+  const businessCategories = categories.filter((c) => c.type === "business");
 
   const getTasksByCategory = (categoryId: string) => {
-    return tasks.filter((task) => task.categoryId === categoryId && task.show)
-  }
+    return tasks.filter((task) => task.categoryId === categoryId && task.show);
+  };
 
   const handleTaskClick = (task: Task) => {
-    setSelectedTask(task)
-    setShowTaskModal(true)
-  }
+    setSelectedTask(task);
+    setShowTaskModal(true);
+  };
 
   const handleCloseModal = () => {
-    setShowTaskModal(false)
-    setSelectedTask(null)
-  }
+    setShowTaskModal(false);
+    setSelectedTask(null);
+  };
 
   return (
     <div>
@@ -35,7 +35,8 @@ export default function CategoriesBoard() {
           Categories Board
         </h1>
         <p className="text-gray-600 dark:text-gray-400">
-          Organize your tasks by category - Edit category names or delete them directly
+          Organize your tasks by category - Edit category names or delete them
+          directly
         </p>
       </div>
 
@@ -90,11 +91,11 @@ export default function CategoriesBoard() {
       <TaskFormModal
         open={showTaskModal}
         onOpenChange={(open) => {
-          if (!open) handleCloseModal()
-          else setShowTaskModal(open)
+          if (!open) handleCloseModal();
+          else setShowTaskModal(open);
         }}
         task={selectedTask}
       />
     </div>
-  )
+  );
 }

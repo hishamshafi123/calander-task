@@ -1,15 +1,15 @@
-'use client'
+"use client";
 
-import { Task, TaskStatus } from '@/lib/types'
-import { useStore } from '@/lib/store'
-import TaskCard from '@/components/tasks/task-card'
+import { Task, TaskStatus } from "@/lib/types";
+import { useStore } from "@/lib/store";
+import TaskCard from "@/components/tasks/task-card";
 
 interface StatusColumnProps {
-  status: TaskStatus
-  label: string
-  icon: string
-  tasks: Task[]
-  onTaskClick?: (task: Task) => void
+  status: TaskStatus;
+  label: string;
+  icon: string;
+  tasks: Task[];
+  onTaskClick?: (task: Task) => void;
 }
 
 export default function StatusColumn({
@@ -19,24 +19,24 @@ export default function StatusColumn({
   tasks,
   onTaskClick,
 }: StatusColumnProps) {
-  const { updateTask } = useStore()
+  const { updateTask } = useStore();
 
   const statusColors = {
-    'not-started': 'bg-gray-100 dark:bg-gray-700',
-    'waiting': 'bg-yellow-100 dark:bg-yellow-900/30',
-    'in-progress': 'bg-blue-100 dark:bg-blue-900/30',
-    'completed': 'bg-green-100 dark:bg-green-900/30',
-  }
+    "not-started": "bg-gray-100 dark:bg-gray-700",
+    waiting: "bg-yellow-100 dark:bg-yellow-900/30",
+    "in-progress": "bg-blue-100 dark:bg-blue-900/30",
+    completed: "bg-green-100 dark:bg-green-900/30",
+  };
 
   const handleStatusChange = async (taskId: string, newStatus: TaskStatus) => {
-    updateTask(taskId, { status: newStatus })
+    updateTask(taskId, { status: newStatus });
 
     await fetch(`/api/tasks/${taskId}`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ status: newStatus }),
-    })
-  }
+    });
+  };
 
   return (
     <div className="flex flex-col h-full">
@@ -64,14 +64,11 @@ export default function StatusColumn({
         ) : (
           tasks.map((task) => (
             <div key={task.id}>
-              <TaskCard
-                task={task}
-                onClick={() => onTaskClick?.(task)}
-              />
+              <TaskCard task={task} onClick={() => onTaskClick?.(task)} />
             </div>
           ))
         )}
       </div>
     </div>
-  )
+  );
 }

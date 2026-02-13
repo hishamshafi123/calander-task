@@ -1,15 +1,15 @@
-import * as React from "react"
-import { cn } from "@/lib/utils"
-import { X } from "lucide-react"
+import * as React from "react";
+import { cn } from "@/lib/utils";
+import { X } from "lucide-react";
 
 interface DialogProps {
-  open: boolean
-  onOpenChange: (open: boolean) => void
-  children: React.ReactNode
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  children: React.ReactNode;
 }
 
 export function Dialog({ open, onOpenChange, children }: DialogProps) {
-  if (!open) return null
+  if (!open) return null;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
@@ -21,7 +21,7 @@ export function Dialog({ open, onOpenChange, children }: DialogProps) {
         {children}
       </div>
     </div>
-  )
+  );
 }
 
 export function DialogContent({
@@ -29,15 +29,15 @@ export function DialogContent({
   className,
   onClose,
 }: {
-  children: React.ReactNode
-  className?: string
-  onClose?: () => void
+  children: React.ReactNode;
+  className?: string;
+  onClose?: () => void;
 }) {
   return (
     <div
       className={cn(
         "bg-white dark:bg-gray-800 rounded-lg shadow-xl p-6 w-full max-w-2xl",
-        className
+        className,
       )}
     >
       {onClose && (
@@ -50,47 +50,48 @@ export function DialogContent({
       )}
       {children}
     </div>
-  )
+  );
 }
 
 export function DialogHeader({
   children,
   className,
 }: {
-  children: React.ReactNode
-  className?: string
+  children: React.ReactNode;
+  className?: string;
 }) {
-  return (
-    <div className={cn("mb-4", className)}>
-      {children}
-    </div>
-  )
+  return <div className={cn("mb-4", className)}>{children}</div>;
 }
 
 export function DialogTitle({
   children,
   className,
 }: {
-  children: React.ReactNode
-  className?: string
+  children: React.ReactNode;
+  className?: string;
 }) {
   return (
-    <h2 className={cn("text-2xl font-bold text-gray-900 dark:text-white", className)}>
+    <h2
+      className={cn(
+        "text-2xl font-bold text-gray-900 dark:text-white",
+        className,
+      )}
+    >
       {children}
     </h2>
-  )
+  );
 }
 
 export function DialogFooter({
   children,
   className,
 }: {
-  children: React.ReactNode
-  className?: string
+  children: React.ReactNode;
+  className?: string;
 }) {
   return (
     <div className={cn("flex justify-end space-x-2 mt-6", className)}>
       {children}
     </div>
-  )
+  );
 }
