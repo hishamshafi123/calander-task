@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useStore } from "@/lib/store";
 import { Button } from "@/components/ui/button";
 import CategoryManager from "@/components/settings/category-manager";
+import ChangePasswordForm from "@/components/auth/change-password-form";
 
 export default function SettingsPage() {
   const { settings, setSettings, setCategories } = useStore();
@@ -118,6 +119,14 @@ export default function SettingsPage() {
       {/* Categories Section - Separate Card */}
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 mt-6">
         <CategoryManager />
+      </div>
+
+      {/* Security Section */}
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 mt-6">
+        <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+          Security
+        </h2>
+        <ChangePasswordForm />
       </div>
     </div>
   );
