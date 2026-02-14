@@ -14,7 +14,7 @@ export async function GET() {
           id: "default",
           weekStartsOn: 1,
           defaultView: "month",
-          darkMode: false,
+          darkMode: true,
           showCompleted: true,
           defaultStatus: "not-started",
         },
@@ -48,7 +48,7 @@ export async function PATCH(request: NextRequest) {
         id: "default",
         weekStartsOn: body.weekStartsOn || 1,
         defaultView: body.defaultView || "month",
-        darkMode: body.darkMode || false,
+        darkMode: body.darkMode ?? true,
         showCompleted:
           body.showCompleted !== undefined ? body.showCompleted : true,
         defaultStatus: body.defaultStatus || "not-started",
