@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useStore } from "@/lib/store";
 import { Task } from "@/lib/types";
 import CategoryColumn from "./category-column";
-import TaskFormModal from "@/components/tasks/task-form-modal";
+import TaskModal from "@/components/tasks/task-modal";
 
 export default function CategoriesBoard() {
   const { tasks, categories } = useStore();
@@ -88,7 +88,7 @@ export default function CategoriesBoard() {
         </div>
       )}
 
-      <TaskFormModal
+      <TaskModal
         open={showTaskModal}
         onOpenChange={(open) => {
           if (!open) handleCloseModal();

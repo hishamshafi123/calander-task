@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useStore } from "@/lib/store";
 import { Task, TaskStatus } from "@/lib/types";
 import StatusColumn from "./status-column";
-import TaskFormModal from "@/components/tasks/task-form-modal";
+import TaskModal from "@/components/tasks/task-modal";
 
 const columns: { status: TaskStatus; label: string; icon: string }[] = [
   { status: "not-started", label: "Not Started", icon: "⭕" },
@@ -56,7 +56,7 @@ export default function StatusBoard() {
         ))}
       </div>
 
-      <TaskFormModal
+      <TaskModal
         open={showTaskModal}
         onOpenChange={(open) => {
           if (!open) handleCloseModal();

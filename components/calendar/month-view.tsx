@@ -19,7 +19,7 @@ import {
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import TaskCard from "@/components/tasks/task-card";
-import TaskFormModal from "@/components/tasks/task-form-modal";
+import TaskModal from "@/components/tasks/task-modal";
 import DayTasksModal from "./day-tasks-modal";
 
 export default function MonthView() {
@@ -217,7 +217,7 @@ export default function MonthView() {
         </div>
       </div>
 
-      <TaskFormModal
+      <TaskModal
         open={showTaskModal}
         onOpenChange={(open) => {
           if (!open) handleCloseModal();

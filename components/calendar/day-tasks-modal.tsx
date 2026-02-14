@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/modal";
 import { Button } from "@/components/ui/button";
 import TaskCard from "@/components/tasks/task-card";
+import TaskModal from "@/components/tasks/task-modal";
 import TaskFormModal from "@/components/tasks/task-form-modal";
 import { Plus } from "lucide-react";
 
@@ -116,7 +117,7 @@ export default function DayTasksModal({
         </ModalContent>
       </Modal>
 
-      <TaskFormModal
+      <TaskModal
         open={showTaskModal}
         onOpenChange={(open) => {
           if (!open) handleCloseTaskModal();
