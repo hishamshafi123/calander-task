@@ -1,17 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { getUserIdFromRequest, requireAdmin } from "@/lib/api-helpers";
+import { getAssignedProjects, logActivity } from "@/lib/permissions";
 
-export async function GET() {
+export async function GET(request: NextRequest) {
+  const userId = getUserIdFromRequest(request);
+  if (!userId) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   try {
-    const projects = await prisma.project.findMany({
-      orderBy: {
-        order: "asc",
-      },
-      include: {
-        categories: true,
-      },
-    });
-
+    const projects = await getAssignedProjects(userId);
     return NextResponse.json(projects);
   } catch (error) {
     console.error("Error fetching projects:", error);
@@ -23,6 +22,11 @@ export async function GET() {
 }
 
 export async function POST(request: NextRequest) {
+  const adminCheck = await requireAdmin(request);
+  if (adminCheck) return adminCheck;
+
+  const userId = getUserIdFromRequest(request)!;
+
   try {
     const body = await request.json();
 
@@ -34,6 +38,8 @@ export async function POST(request: NextRequest) {
         order: body.order || 0,
       },
     });
+
+    await logActivity(userId, "created", "project", project.id, project.name);
 
     return NextResponse.json(project, { status: 201 });
   } catch (error) {

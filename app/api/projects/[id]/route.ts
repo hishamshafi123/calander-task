@@ -1,13 +1,29 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import {
+  getUserIdFromRequest,
+  requireAdmin,
+} from "@/lib/api-helpers";
+import { canAccessProject, logActivity } from "@/lib/permissions";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } },
+  { params }: { params: Promise<{ id: string }> },
 ) {
+  const userId = getUserIdFromRequest(request);
+  if (!userId) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   try {
+    const { id } = await params;
+
+    if (!(await canAccessProject(userId, id))) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+
     const project = await prisma.project.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         categories: true,
       },
@@ -29,13 +45,19 @@ export async function GET(
 
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } },
+  { params }: { params: Promise<{ id: string }> },
 ) {
+  const adminCheck = await requireAdmin(request);
+  if (adminCheck) return adminCheck;
+
+  const userId = getUserIdFromRequest(request)!;
+
   try {
+    const { id } = await params;
     const body = await request.json();
 
     const project = await prisma.project.update({
-      where: { id: params.id },
+      where: { id },
       data: {
         name: body.name,
         description: body.description,
@@ -43,6 +65,8 @@ export async function PATCH(
         order: body.order,
       },
     });
+
+    await logActivity(userId, "updated", "project", project.id, project.name);
 
     return NextResponse.json(project);
   } catch (error) {
@@ -56,12 +80,17 @@ export async function PATCH(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } },
+  { params }: { params: Promise<{ id: string }> },
 ) {
+  const adminCheck = await requireAdmin(request);
+  if (adminCheck) return adminCheck;
+
+  const userId = getUserIdFromRequest(request)!;
+
   try {
-    // Check if project has categories
+    const { id } = await params;
     const project = await prisma.project.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         categories: true,
       },
@@ -82,8 +111,10 @@ export async function DELETE(
     }
 
     await prisma.project.delete({
-      where: { id: params.id },
+      where: { id },
     });
+
+    await logActivity(userId, "deleted", "project", project.id, project.name);
 
     return NextResponse.json({ success: true });
   } catch (error) {
