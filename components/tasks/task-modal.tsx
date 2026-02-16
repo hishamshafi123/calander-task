@@ -142,12 +142,7 @@ export default function TaskModal({
       <Modal open={open && !showFormModal} onOpenChange={handleClose}>
         <ModalContent onClose={handleClose}>
           <ModalHeader>
-            <div className="flex items-center space-x-3">
-              {currentTask.category && (
-                <span className="text-2xl">{currentTask.category.icon}</span>
-              )}
-              <ModalTitle>{currentTask.title}</ModalTitle>
-            </div>
+            <ModalTitle>{currentTask.title}</ModalTitle>
           </ModalHeader>
 
           <div className="space-y-5">

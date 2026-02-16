@@ -2,7 +2,7 @@
 
 import { SubmitEvent, useState } from "react";
 import { useStore } from "@/lib/store";
-import { Category, CategoryType } from "@/lib/types";
+import { Category } from "@/lib/types";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -17,14 +17,13 @@ import { ConfirmDialog, AlertDialog } from "@/components/ui/confirm-dialog";
 import { Plus, Pencil, Trash2 } from "lucide-react";
 
 export default function CategoryManager() {
-  const { categories, addCategory, updateCategory, deleteCategory } =
+  const { categories, projects, addCategory, updateCategory, deleteCategory } =
     useStore();
   const [showModal, setShowModal] = useState(false);
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
   const [name, setName] = useState("");
-  const [icon, setIcon] = useState("");
   const [color, setColor] = useState("#3b82f6");
-  const [type, setType] = useState<CategoryType>("life");
+  const [projectId, setProjectId] = useState<string>("");
   const [deletingCategory, setDeletingCategory] = useState<Category | null>(
     null,
   );
@@ -32,9 +31,8 @@ export default function CategoryManager() {
 
   const resetForm = () => {
     setName("");
-    setIcon("");
     setColor("#3b82f6");
-    setType("life");
+    setProjectId(projects.length > 0 ? projects[0].id : "");
     setEditingCategory(null);
   };
 
@@ -42,9 +40,8 @@ export default function CategoryManager() {
     if (category) {
       setEditingCategory(category);
       setName(category.name);
-      setIcon(category.icon);
       setColor(category.color);
-      setType(category.type);
+      setProjectId(category.projectId || "");
     } else {
       resetForm();
     }
@@ -54,13 +51,18 @@ export default function CategoryManager() {
   const handleSubmit = async (e: SubmitEvent) => {
     e.preventDefault();
 
+    if (!projectId) {
+      setAlertMessage("Please select a project");
+      return;
+    }
+
     try {
       if (editingCategory) {
         // Update existing category
         const response = await fetch(`/api/categories/${editingCategory.id}`, {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ name, icon, color, type }),
+          body: JSON.stringify({ name, color, projectId }),
         });
 
         if (response.ok) {
@@ -74,9 +76,8 @@ export default function CategoryManager() {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             name,
-            icon,
             color,
-            type,
+            projectId,
             order: categories.length,
           }),
         });
@@ -116,49 +117,56 @@ export default function CategoryManager() {
     }
   };
 
-  const lifeCategories = categories.filter((c) => c.type === "life");
-  const businessCategories = categories.filter((c) => c.type === "business");
-
-  const CategoryCard = ({ category }: { category: Category }) => (
-    <div
-      key={category.id}
-      className="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800"
-    >
-      <div className="flex items-center space-x-3 flex-1">
-        <span className="text-2xl">{category.icon}</span>
-        <div className="flex-1">
-          <div className="flex items-center gap-2">
-            <div className="font-medium text-gray-900 dark:text-white">
-              {category.name}
+  const CategoryCard = ({ category }: { category: Category }) => {
+    const project = projects.find((p) => p.id === category.projectId);
+    return (
+      <div
+        key={category.id}
+        className="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800"
+      >
+        <div className="flex items-center space-x-3 flex-1">
+          <div className="flex-1">
+            <div className="flex items-center gap-2">
+              <div className="font-medium text-gray-900 dark:text-white">
+                {category.name}
+              </div>
+              {project && (
+                <span className="text-xs px-2 py-0.5 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400">
+                  {project.name}
+                </span>
+              )}
             </div>
-            <span className="text-xs px-2 py-0.5 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400">
-              {category.type}
-            </span>
+            <div
+              className="w-16 h-2 rounded mt-1"
+              style={{ backgroundColor: category.color }}
+            />
           </div>
-          <div
-            className="w-16 h-2 rounded mt-1"
-            style={{ backgroundColor: category.color }}
-          />
+        </div>
+        <div className="flex space-x-1">
+          <Button
+            size="icon"
+            variant="ghost"
+            onClick={() => handleOpenModal(category)}
+          >
+            <Pencil className="h-4 w-4" />
+          </Button>
+          <Button
+            size="icon"
+            variant="ghost"
+            onClick={() => handleDeleteClick(category)}
+          >
+            <Trash2 className="h-4 w-4" />
+          </Button>
         </div>
       </div>
-      <div className="flex space-x-1">
-        <Button
-          size="icon"
-          variant="ghost"
-          onClick={() => handleOpenModal(category)}
-        >
-          <Pencil className="h-4 w-4" />
-        </Button>
-        <Button
-          size="icon"
-          variant="ghost"
-          onClick={() => handleDeleteClick(category)}
-        >
-          <Trash2 className="h-4 w-4" />
-        </Button>
-      </div>
-    </div>
-  );
+    );
+  };
+
+  // Group categories by project
+  const categoriesByProject = projects.map((project) => ({
+    project,
+    categories: categories.filter((c) => c.projectId === project.id),
+  }));
 
   return (
     <div>
@@ -166,49 +174,47 @@ export default function CategoryManager() {
         <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
           Categories
         </h3>
-        <Button size="sm" onClick={() => handleOpenModal()}>
+        <Button
+          size="sm"
+          onClick={() => handleOpenModal()}
+          disabled={projects.length === 0}
+        >
           <Plus className="h-4 w-4 mr-2" />
           Add Category
         </Button>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Life Categories */}
-        <div>
-          <h4 className="text-md font-semibold text-gray-700 dark:text-gray-300 mb-3">
-            Life Categories
-          </h4>
-          <div className="space-y-3">
-            {lifeCategories.length > 0 ? (
-              lifeCategories.map((category) => (
-                <CategoryCard key={category.id} category={category} />
-              ))
-            ) : (
-              <p className="text-sm text-gray-500 dark:text-gray-400 italic">
-                No life categories yet
-              </p>
-            )}
-          </div>
+      {projects.length === 0 ? (
+        <div className="text-center py-8 border border-dashed border-gray-300 dark:border-gray-600 rounded-lg">
+          <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">
+            No projects available
+          </p>
+          <p className="text-xs text-gray-400 dark:text-gray-500">
+            Create a project first before adding categories
+          </p>
         </div>
-
-        {/* Business Categories */}
-        <div>
-          <h4 className="text-md font-semibold text-gray-700 dark:text-gray-300 mb-3">
-            Business Categories
-          </h4>
-          <div className="space-y-3">
-            {businessCategories.length > 0 ? (
-              businessCategories.map((category) => (
-                <CategoryCard key={category.id} category={category} />
-              ))
-            ) : (
-              <p className="text-sm text-gray-500 dark:text-gray-400 italic">
-                No business categories yet
-              </p>
-            )}
-          </div>
+      ) : (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {categoriesByProject.map(({ project, categories: projectCats }) => (
+            <div key={project.id}>
+              <h4 className="text-md font-semibold text-gray-700 dark:text-gray-300 mb-3">
+                {project.name}
+              </h4>
+              <div className="space-y-3">
+                {projectCats.length > 0 ? (
+                  projectCats.map((category) => (
+                    <CategoryCard key={category.id} category={category} />
+                  ))
+                ) : (
+                  <p className="text-sm text-gray-500 dark:text-gray-400 italic">
+                    No categories in this project
+                  </p>
+                )}
+              </div>
+            </div>
+          ))}
         </div>
-      </div>
+      )}
 
       <Modal open={showModal} onOpenChange={setShowModal}>
         <ModalContent onClose={() => setShowModal(false)}>
@@ -228,21 +234,6 @@ export default function CategoryManager() {
                 placeholder="e.g., Work"
                 required
               />
-            </div>
-
-            <div>
-              <Label htmlFor="icon">Icon (Emoji) *</Label>
-              <Input
-                id="icon"
-                value={icon}
-                onChange={(e) => setIcon(e.target.value)}
-                placeholder="e.g., 💼"
-                maxLength={2}
-                required
-              />
-              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                Use any emoji or symbol
-              </p>
             </div>
 
             <div>
@@ -267,35 +258,21 @@ export default function CategoryManager() {
             </div>
 
             <div>
-              <Label>Category Type *</Label>
-              <div className="flex items-center space-x-4 mt-2">
-                <label className="flex items-center space-x-2 cursor-pointer">
-                  <input
-                    type="radio"
-                    name="categoryType"
-                    value="life"
-                    checked={type === "life"}
-                    onChange={(e) => setType(e.target.value as CategoryType)}
-                    className="w-4 h-4 text-blue-600"
-                  />
-                  <span className="text-sm text-gray-900 dark:text-white">
-                    Life
-                  </span>
-                </label>
-                <label className="flex items-center space-x-2 cursor-pointer">
-                  <input
-                    type="radio"
-                    name="categoryType"
-                    value="business"
-                    checked={type === "business"}
-                    onChange={(e) => setType(e.target.value as CategoryType)}
-                    className="w-4 h-4 text-blue-600"
-                  />
-                  <span className="text-sm text-gray-900 dark:text-white">
-                    Business
-                  </span>
-                </label>
-              </div>
+              <Label htmlFor="project">Project *</Label>
+              <select
+                id="project"
+                value={projectId}
+                onChange={(e) => setProjectId(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                required
+              >
+                <option value="">Select a project</option>
+                {projects.map((project) => (
+                  <option key={project.id} value={project.id}>
+                    {project.name}
+                  </option>
+                ))}
+              </select>
             </div>
 
             <ModalFooter>

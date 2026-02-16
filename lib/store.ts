@@ -2,6 +2,7 @@ import { create } from "zustand";
 import {
   Task,
   Category,
+  Project,
   Settings,
   CalendarView,
   CategoryFilter,
@@ -10,6 +11,7 @@ import {
 interface AppState {
   tasks: Task[];
   categories: Category[];
+  projects: Project[];
   settings: Settings | null;
   currentView: CalendarView;
   selectedDate: Date;
@@ -18,6 +20,7 @@ interface AppState {
 
   setTasks: (tasks: Task[]) => void;
   setCategories: (categories: Category[]) => void;
+  setProjects: (projects: Project[]) => void;
   setSettings: (settings: Settings) => void;
   setCurrentView: (view: CalendarView) => void;
   setSelectedDate: (date: Date) => void;
@@ -31,11 +34,16 @@ interface AppState {
   addCategory: (category: Category) => void;
   updateCategory: (id: string, category: Partial<Category>) => void;
   deleteCategory: (id: string) => void;
+
+  addProject: (project: Project) => void;
+  updateProject: (id: string, project: Partial<Project>) => void;
+  deleteProject: (id: string) => void;
 }
 
 export const useStore = create<AppState>((set) => ({
   tasks: [],
   categories: [],
+  projects: [],
   settings: null,
   currentView: "month",
   selectedDate: new Date(),
@@ -44,6 +52,7 @@ export const useStore = create<AppState>((set) => ({
 
   setTasks: (tasks) => set({ tasks }),
   setCategories: (categories) => set({ categories }),
+  setProjects: (projects) => set({ projects }),
   setSettings: (settings) => set({ settings }),
   setCurrentView: (view) => set({ currentView: view }),
   setSelectedDate: (date) => set({ selectedDate: date }),
@@ -71,5 +80,18 @@ export const useStore = create<AppState>((set) => ({
   deleteCategory: (id) =>
     set((state) => ({
       categories: state.categories.filter((c) => c.id !== id),
+    })),
+
+  addProject: (project) =>
+    set((state) => ({ projects: [...state.projects, project] })),
+  updateProject: (id, updatedProject) =>
+    set((state) => ({
+      projects: state.projects.map((p) =>
+        p.id === id ? { ...p, ...updatedProject } : p,
+      ),
+    })),
+  deleteProject: (id) =>
+    set((state) => ({
+      projects: state.projects.filter((p) => p.id !== id),
     })),
 }));

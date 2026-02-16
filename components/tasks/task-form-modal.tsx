@@ -69,7 +69,7 @@ export default function TaskFormModal({
       setDate(
         defaultDate
           ? `${defaultDate.getFullYear()}-${String(defaultDate.getMonth() + 1).padStart(2, "0")}-${String(defaultDate.getDate()).padStart(2, "0")}`
-          : ""
+          : "",
       );
       setStartTime("");
       setEndTime("");
@@ -186,7 +186,7 @@ export default function TaskFormModal({
               >
                 {categories.map((cat) => (
                   <option key={cat.id} value={cat.id}>
-                    {cat.icon} {cat.name}
+                    {cat.name}
                   </option>
                 ))}
               </Select>

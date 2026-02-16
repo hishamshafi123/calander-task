@@ -10,7 +10,7 @@ import TaskFormModal from "@/components/tasks/task-form-modal";
 export default function Header() {
   const router = useRouter();
   const { settings, setSettings } = useStore();
-  const isDark = settings?.darkMode ?? false;
+  const isDark = settings?.darkMode ?? true;
   const [showTaskModal, setShowTaskModal] = useState(false);
 
   const handleLogout = async () => {
@@ -20,8 +20,9 @@ export default function Header() {
   };
 
   useEffect(() => {
+    if (settings === null) return;
     document.documentElement.classList.toggle("dark", isDark);
-  }, [isDark]);
+  }, [isDark, settings]);
 
   const toggleDarkMode = async () => {
     if (!settings) return;

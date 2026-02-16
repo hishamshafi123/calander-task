@@ -1,12 +1,24 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { getUserIdFromRequest } from "@/lib/api-helpers";
+import { canAccessTask, isAdmin } from "@/lib/permissions";
 
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ) {
+  const userId = getUserIdFromRequest(request);
+  if (!userId) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   try {
     const { id } = await params;
+
+    if (!(await canAccessTask(userId, id))) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+
     const task = await prisma.task.findUnique({
       where: { id },
       include: {
@@ -32,6 +44,15 @@ export async function PATCH(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ) {
+  const userId = getUserIdFromRequest(request);
+  if (!userId) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  if (!(await isAdmin(userId))) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
+
   try {
     const { id } = await params;
     const body = await request.json();
@@ -79,6 +100,15 @@ export async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ) {
+  const userId = getUserIdFromRequest(request);
+  if (!userId) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  if (!(await isAdmin(userId))) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
+
   try {
     const { id } = await params;
     await prisma.task.delete({
