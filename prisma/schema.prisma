@@ -9,12 +9,26 @@ datasource db {
   provider = "postgresql"
 }
 
+model Project {
+  id          String     @id @default(uuid())
+  name        String
+  description String?
+  color       String     @default("#3b82f6")
+  order       Int        @default(0)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  categories  Category[]
+
+  @@map("projects")
+}
+
 model Category {
   id        String   @id @default(uuid())
   name      String
   icon      String
   color     String
-  type      String   @default("life") // life, business
+  projectId String?
+  project   Project? @relation(fields: [projectId], references: [id], onDelete: Cascade)
   order     Int      @default(0)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

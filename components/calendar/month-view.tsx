@@ -26,6 +26,7 @@ export default function MonthView() {
   const {
     tasks,
     categories,
+    projects,
     setSelectedDate,
     categoryFilter,
     setCategoryFilter,
@@ -76,7 +77,7 @@ export default function MonthView() {
       // Apply category filter
       if (categoryFilter === "all") return true;
       const taskCategory = categories.find((c) => c.id === task.categoryId);
-      return taskCategory?.type === categoryFilter;
+      return taskCategory?.projectId === categoryFilter;
     });
   };
 
@@ -105,7 +106,7 @@ export default function MonthView() {
       {/* Header */}
       <div className="p-6 border-b border-gray-200 dark:border-gray-700">
         {/* Filter Buttons */}
-        <div className="flex items-center justify-center space-x-2 mb-4">
+        <div className="flex items-center justify-center flex-wrap gap-2 mb-4">
           <Button
             variant={categoryFilter === "all" ? "default" : "outline"}
             size="sm"
@@ -113,20 +114,16 @@ export default function MonthView() {
           >
             All
           </Button>
-          <Button
-            variant={categoryFilter === "life" ? "default" : "outline"}
-            size="sm"
-            onClick={() => setCategoryFilter("life")}
-          >
-            Life
-          </Button>
-          <Button
-            variant={categoryFilter === "business" ? "default" : "outline"}
-            size="sm"
-            onClick={() => setCategoryFilter("business")}
-          >
-            Business
-          </Button>
+          {projects.map((project) => (
+            <Button
+              key={project.id}
+              variant={categoryFilter === project.id ? "default" : "outline"}
+              size="sm"
+              onClick={() => setCategoryFilter(project.id)}
+            >
+              {project.name}
+            </Button>
+          ))}
         </div>
 
         {/* Month Navigation */}

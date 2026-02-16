@@ -15,12 +15,24 @@ export interface Task {
   category?: Category;
 }
 
+export interface Project {
+  id: string;
+  name: string;
+  description?: string | null;
+  color: string;
+  order: number;
+  createdAt?: Date | string;
+  updatedAt?: Date | string;
+  categories?: Category[];
+}
+
 export interface Category {
   id: string;
   name: string;
   icon: string;
   color: string;
-  type: "life" | "business";
+  projectId?: string | null;
+  project?: Project;
   order: number;
   createdAt?: Date | string;
   updatedAt?: Date | string;
@@ -44,8 +56,7 @@ export type TaskStatus =
   | "completed";
 export type TaskPriority = "low" | "medium" | "high";
 export type CalendarView = "month" | "week" | "day";
-export type CategoryType = "life" | "business";
-export type CategoryFilter = "all" | "life" | "business";
+export type CategoryFilter = "all" | string; // "all" or project ID
 
 export const STATUS_COLORS = {
   "not-started": "#6b7280",

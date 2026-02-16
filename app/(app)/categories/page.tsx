@@ -5,7 +5,8 @@ import { useStore } from "@/lib/store";
 import CategoriesBoard from "@/components/categories/categories-board";
 
 export default function CategoriesPage() {
-  const { setTasks, setCategories, setSettings, setIsLoading } = useStore();
+  const { setTasks, setCategories, setProjects, setSettings, setIsLoading } =
+    useStore();
 
   useEffect(() => {
     async function fetchData() {
@@ -14,6 +15,10 @@ export default function CategoriesPage() {
         const tasksRes = await fetch("/api/tasks");
         const tasks = await tasksRes.json();
         setTasks(tasks);
+
+        const projectsRes = await fetch("/api/projects");
+        const projects = await projectsRes.json();
+        setProjects(projects);
 
         const categoriesRes = await fetch("/api/categories");
         const categories = await categoriesRes.json();
@@ -30,7 +35,7 @@ export default function CategoriesPage() {
     }
 
     fetchData();
-  }, [setTasks, setCategories, setSettings, setIsLoading]);
+  }, [setTasks, setCategories, setProjects, setSettings, setIsLoading]);
 
   return (
     <div className="p-6">

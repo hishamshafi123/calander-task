@@ -5,7 +5,8 @@ import { useStore } from "@/lib/store";
 import MonthView from "@/components/calendar/month-view";
 
 export default function Home() {
-  const { setTasks, setCategories, setSettings, setIsLoading } = useStore();
+  const { setTasks, setCategories, setProjects, setSettings, setIsLoading } =
+    useStore();
 
   useEffect(() => {
     async function fetchData() {
@@ -15,6 +16,11 @@ export default function Home() {
         const tasksRes = await fetch("/api/tasks");
         const tasks = await tasksRes.json();
         setTasks(tasks);
+
+        // Fetch projects
+        const projectsRes = await fetch("/api/projects");
+        const projects = await projectsRes.json();
+        setProjects(projects);
 
         // Fetch categories
         const categoriesRes = await fetch("/api/categories");
@@ -33,7 +39,7 @@ export default function Home() {
     }
 
     fetchData();
-  }, [setTasks, setCategories, setSettings, setIsLoading]);
+  }, [setTasks, setCategories, setProjects, setSettings, setIsLoading]);
 
   return (
     <div className="p-6">

@@ -5,10 +5,11 @@ import { useStore } from "@/lib/store";
 import { Button } from "@/components/ui/button";
 import { AlertDialog } from "@/components/ui/confirm-dialog";
 import CategoryManager from "@/components/settings/category-manager";
+import ProjectManager from "@/components/projects/project-manager";
 import ChangePasswordForm from "@/components/auth/change-password-form";
 
 export default function SettingsPage() {
-  const { settings, setSettings, setCategories } = useStore();
+  const { settings, setSettings, setCategories, setProjects } = useStore();
   const [weekStartsOn, setWeekStartsOn] = useState(1);
   const [defaultView, setDefaultView] = useState<"month" | "week" | "day">(
     "month",
@@ -25,13 +26,17 @@ export default function SettingsPage() {
       setDefaultView(settingsData.defaultView);
       setShowCompleted(settingsData.showCompleted);
 
+      const projectsRes = await fetch("/api/projects");
+      const projectsData = await projectsRes.json();
+      setProjects(projectsData);
+
       const categoriesRes = await fetch("/api/categories");
       const categoriesData = await categoriesRes.json();
       setCategories(categoriesData);
     }
 
     fetchData();
-  }, [setSettings, setCategories]);
+  }, [setSettings, setCategories, setProjects]);
 
   const handleSave = async () => {
     const updatedSettings = {
@@ -116,6 +121,11 @@ export default function SettingsPage() {
             Save Settings
           </Button>
         </div>
+      </div>
+
+      {/* Projects Section */}
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 mt-6">
+        <ProjectManager />
       </div>
 
       {/* Categories Section - Separate Card */}
