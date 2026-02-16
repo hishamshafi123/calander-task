@@ -244,7 +244,6 @@ export async function getAccessibleAllCategories(userId: string) {
   const categories: Array<{
     id: string;
     name: string;
-    icon: string;
     color: string;
     projectId: string | null;
     order: number;
