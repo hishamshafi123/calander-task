@@ -42,9 +42,6 @@ export default function TaskCard({
         onClick={onClick}
       >
         <div className="flex items-center space-x-1">
-          {task.category && (
-            <span className="text-sm">{task.category.icon}</span>
-          )}
           <span className={cn(task.status === "completed" && "line-through")}>
             {task.title}
           </span>
@@ -65,9 +62,6 @@ export default function TaskCard({
       <div className="flex items-start justify-between">
         <div className="flex-1">
           <div className="flex items-center space-x-2">
-            {task.category && (
-              <span className="text-lg">{task.category.icon}</span>
-            )}
             <h3
               className={cn(
                 "font-medium",

@@ -432,7 +432,7 @@ export default function ProjectAssignments({
                           style={{ backgroundColor: category.color }}
                         />
                         <span className="text-sm text-gray-900 dark:text-white">
-                          {category.icon} {category.name}
+                          {category.name}
                         </span>
                       </label>
                     ))}
