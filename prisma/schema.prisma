@@ -9,76 +9,155 @@ datasource db {
   provider = "postgresql"
 }
 
+model Role {
+  id          String   @id @default(uuid())
+  name        String   @unique
+  description String?
+  color       String   @default("#3b82f6")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  users       User[]
+
+  @@map("roles")
+}
+
 model Project {
-  id          String     @id @default(uuid())
+  id          String              @id @default(uuid())
   name        String
   description String?
-  color       String     @default("#3b82f6")
-  order       Int        @default(0)
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
+  color       String              @default("#3b82f6")
+  order       Int                 @default(0)
+  createdAt   DateTime            @default(now())
+  updatedAt   DateTime            @updatedAt
   categories  Category[]
+  assignments ProjectAssignment[]
 
   @@map("projects")
 }
 
 model Category {
-  id        String   @id @default(uuid())
-  name      String
-  icon      String
-  color     String
-  projectId String?
-  project   Project? @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  order     Int      @default(0)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  tasks     Task[]
+  id          String               @id @default(uuid())
+  name        String
+  icon        String
+  color       String
+  projectId   String?
+  project     Project?             @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  order       Int                  @default(0)
+  createdAt   DateTime             @default(now())
+  updatedAt   DateTime             @updatedAt
+  tasks       Task[]
+  permissions CategoryPermission[]
 
   @@map("categories")
 }
 
 model Task {
-  id          String   @id @default(uuid())
+  id          String           @id @default(uuid())
   title       String
   description String?
   date        DateTime?
   startTime   String?
   endTime     String?
-  status      String   @default("not-started") // not-started, waiting, in-progress, completed
-  priority    String   @default("medium") // low, medium, high
-  show        Boolean  @default(true)
+  status      String           @default("not-started") // not-started, waiting, in-progress, completed
+  priority    String           @default("medium") // low, medium, high
+  show        Boolean          @default(true)
   categoryId  String
-  category    Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  category    Category         @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
   completedAt DateTime?
+  assignments TaskAssignment[]
 
   @@map("tasks")
 }
 
 model User {
-  id                String   @id @default(uuid())
-  fullName          String
-  username          String   @unique
-  email             String?  @unique
-  passwordHash      String
-  role              String   @default("admin")
-  passwordChangedAt DateTime @default(now())
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
+  id                 String              @id @default(uuid())
+  fullName           String
+  username           String              @unique
+  email              String?             @unique
+  passwordHash       String
+  roleId             String?
+  role               Role?               @relation(fields: [roleId], references: [id], onDelete: SetNull)
+  timezone           String              @default("UTC")
+  isAdmin            Boolean             @default(false)
+  isActive           Boolean             @default(true)
+  passwordChangedAt  DateTime            @default(now())
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
+  projectAssignments ProjectAssignment[]
+  taskAssignments    TaskAssignment[]
+  activityLogs       ActivityLog[]
 
   @@map("users")
 }
 
+model ProjectAssignment {
+  id                  String               @id @default(uuid())
+  projectId           String
+  userId              String
+  categoryAccessMode  String               @default("all") // "all", "selected", "all_except"
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @updatedAt
+  project             Project              @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  user                User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  categoryPermissions CategoryPermission[]
+
+  @@unique([projectId, userId])
+  @@map("project_assignments")
+}
+
+model CategoryPermission {
+  id                  String            @id @default(uuid())
+  projectAssignmentId String
+  categoryId          String
+  canAccess           Boolean           @default(true)
+  createdAt           DateTime          @default(now())
+  projectAssignment   ProjectAssignment @relation(fields: [projectAssignmentId], references: [id], onDelete: Cascade)
+  category            Category          @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@unique([projectAssignmentId, categoryId])
+  @@map("category_permissions")
+}
+
+model TaskAssignment {
+  id        String   @id @default(uuid())
+  taskId    String
+  userId    String
+  createdAt DateTime @default(now())
+  task      Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([taskId, userId])
+  @@map("task_assignments")
+}
+
+model ActivityLog {
+  id         String   @id @default(uuid())
+  userId     String
+  action     String // "created", "updated", "deleted", "assigned"
+  entityType String // "user", "role", "project", "category", "task"
+  entityId   String
+  entityName String?
+  metadata   Json?
+  createdAt  DateTime @default(now())
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([entityType, entityId])
+  @@index([createdAt])
+  @@map("activity_logs")
+}
+
 model Settings {
-  id             String   @id @default(uuid())
-  weekStartsOn   Int      @default(1) // 0 = Sunday, 1 = Monday
-  defaultView    String   @default("month") // month, week, day
-  darkMode       Boolean  @default(false)
-  showCompleted  Boolean  @default(true)
-  defaultStatus  String   @default("not-started")
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  id            String   @id @default(uuid())
+  weekStartsOn  Int      @default(1) // 0 = Sunday, 1 = Monday
+  defaultView   String   @default("month") // month, week, day
+  darkMode      Boolean  @default(false)
+  showCompleted Boolean  @default(true)
+  defaultStatus String   @default("not-started")
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 
   @@map("settings")
 }
